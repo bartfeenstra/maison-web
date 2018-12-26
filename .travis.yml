@@ -8,11 +8,11 @@ services:
 addons:
   apt:
     packages:
-    - apache2-utils
-    - shellcheck
+      - apache2-utils
+      - shellcheck
   hosts:
-  # Used by ./tests/web-service-proxy-test.
-  - consul.maison
+    # Used by ./tests/web-service-proxy-test.
+    - consul.maison
 
 before_script:
   - ./bin/build-dev
