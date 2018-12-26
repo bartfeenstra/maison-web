@@ -21,7 +21,7 @@ set +a
 htpasswd -b ./data/services/web/htpasswd "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERNAME" "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_PASSWORD"
 
 # It takes a short while before the configuration is updated based on the Consul registry.
-sleep 1
+sleep 3
 
 # We depend on Consul, and that means Consul is the only web service guaranteed to be available for testing.
 ./vendor/wait-for-it "consul.$MAISON_WEB_DOMAIN:80"
