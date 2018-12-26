@@ -13,6 +13,17 @@ addons:
 
 before_script:
   - ./bin/build-dev
+
+  # Set up maison-services.
+  - git clone https://github.com/bartfeenstra/maison-services.git ./vendor/maison-services
+  - ./vendor/maison-services/bin/build
+  - ./vendor/maison-services/bin/start
+
+  # Update configuration with actual maison-services values.
+  - . ./vendor/maison-services/run/.env
+  - sed -Ei "s/^MAISON_WEB_CONSUL_ADDRESS=.*$/MAISON_WEB_CONSUL_ADDRESS=$MAISON_SERVICES_LOCAL_IP/" ./.env
+  - sed -Ei "s/^MAISON_WEB_CONSUL_TOKEN=.*$/MAISON_WEB_CONSUL_TOKEN=$MAISON_SERVICES_CONSUL_TEMPLATE_ACL_TOKEN/" ./.env
+
   - ./bin/start
 
 script:
