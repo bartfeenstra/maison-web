@@ -24,9 +24,5 @@ htpasswd -b ./data/services/web/htpasswd "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERN
 sleep 1
 
 # We depend on Consul, and that means Consul is the only web service guaranteed to be available for testing.
-docker ps
-docker logs maisonweb_web_1
-sleep 9
-docker logs maisonweb_web_1
 ./vendor/wait-for-it "consul.$MAISON_WEB_DOMAIN:80"
 curl -fsL -o /dev/null --user "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERNAME:$MAISON_WEB_TEST_HTTP_BASIC_AUTH_PASSWORD" "$MAISON_WEB_PROTOCOL://consul.$MAISON_WEB_DOMAIN"
