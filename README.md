@@ -1,9 +1,11 @@
-# Maison
+# Maison - Web
 
-[![Build Status](https://travis-ci.org/bartfeenstra/maison.svg?branch=master)](https://travis-ci.org/bartfeenstra/maison)
+[![Build Status](https://travis-ci.org/bartfeenstra/maison-web.svg?branch=master)](https://travis-ci.org/bartfeenstra/maison-web)
 
-# User data
-User dat is stored in `./data` and can be backed up. Data for specific services can be found at `./data/services/*`.
+This is a reverse proxy, SSL terminator, and authorization barrier.
+
+# Runtime data
+Runtime data is stored in `./data` and can be backed up.
 
 # HTTP Basic Auth
 Web applications can be protected using a shared user list, stored at `./data/services/web/htpasswd`. To administer

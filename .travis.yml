@@ -10,21 +10,12 @@ addons:
     packages:
     - apache2-utils
     - shellcheck
-  hosts:
-    - ci.maison
-    - consul.maison
-    - vcs.maison
-    - network.maison
-    - ola.maison
-    - hab.maison
-
-before_install:
-  - sudo /etc/init.d/mysql stop
 
 before_script:
   - ./bin/build-dev
   - ./bin/start
-  - ./bin/migrate
 
 script:
   - ./bin/test
+  # Stopping the services isn't part of the test, but we need it to break the build if it fails.
+  - ./bin/stop
