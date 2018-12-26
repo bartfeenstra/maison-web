@@ -31,6 +31,7 @@ before_script:
   - ./bin/start
 
 script:
+  - docker ps
   - ./bin/test
   # Stopping the services isn't part of the test, but we need it to break the build if it fails.
   - ./bin/stop
