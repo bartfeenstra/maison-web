@@ -8,23 +8,29 @@ services:
 addons:
   apt:
     packages:
-    - apache2-utils
-    - shellcheck
+      - apache2-utils
+      - shellcheck
   hosts:
-    - ci.maison
+    # Used by ./tests/web-service-proxy-test.
     - consul.maison
-    - vcs.maison
-    - network.maison
-    - ola.maison
-    - hab.maison
-
-before_install:
-  - sudo /etc/init.d/mysql stop
 
 before_script:
   - ./bin/build-dev
+
+  # Set up maison-services.
+  - git clone https://github.com/bartfeenstra/maison-services.git ./vendor/maison-services
+  - ./vendor/maison-services/bin/build
+  - ./vendor/maison-services/bin/start
+  - ./vendor/maison-services/bin/await
+
+  # Update configuration with actual maison-services values.
+  - . ./vendor/maison-services/run/.env
+  - sed -Ei "s/^MAISON_WEB_CONSUL_ADDRESS=.*$/MAISON_WEB_CONSUL_ADDRESS=$MAISON_SERVICES_LOCAL_IP/" ./.env
+  - sed -Ei "s/^MAISON_WEB_CONSUL_TOKEN=.*$/MAISON_WEB_CONSUL_TOKEN=$MAISON_SERVICES_CONSUL_TEMPLATE_ACL_TOKEN/" ./.env
+
   - ./bin/start
-  - ./bin/migrate
 
 script:
   - ./bin/test
+  # Stopping the services isn't part of the test, but we need it to break the build if it fails.
+  - ./bin/stop

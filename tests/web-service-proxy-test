@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Test that registered web services are correctly proxied.
+
+set -Eeuo pipefail
+
+trap 'tearDown' ERR EXIT
+
+cd "$(dirname "$0")/.."
+
+tearDown() {
+    htpasswd -D ./data/services/web/htpasswd "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERNAME"
+}
+
+# Prepare the test environment.
+set -a
+. .env
+MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERNAME=maison_web_test
+MAISON_WEB_TEST_HTTP_BASIC_AUTH_PASSWORD=bienvenue
+set +a
+htpasswd -b ./data/services/web/htpasswd "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERNAME" "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_PASSWORD"
+
+# It takes a short while before the configuration is updated based on the Consul registry.
+sleep 9
+
+# We depend on Consul, and that means Consul is the only web service guaranteed to be available for testing.
+./vendor/wait-for-it "consul.$MAISON_WEB_DOMAIN:80"
+curl -fsSL -D - -o /dev/null --user "$MAISON_WEB_TEST_HTTP_BASIC_AUTH_USERNAME:$MAISON_WEB_TEST_HTTP_BASIC_AUTH_PASSWORD" "$MAISON_WEB_PROTOCOL://consul.$MAISON_WEB_DOMAIN"
