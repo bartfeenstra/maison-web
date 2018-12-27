@@ -22,6 +22,7 @@ before_script:
   - ./vendor/maison-services/bin/build
   - ./vendor/maison-services/bin/start
   - ./vendor/maison-services/bin/await
+  - ./vendor/maison-services/bin/migrate
 
   # Update configuration with actual maison-services values.
   - . ./vendor/maison-services/run/.env
