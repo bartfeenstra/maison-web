@@ -25,8 +25,8 @@ before_script:
 
   # Update configuration with actual maison-services values.
   - . ./vendor/maison-services/run/.env
-  - sed -Ei "s/^MAISON_WEB_CONSUL_ADDRESS=.*$/MAISON_WEB_CONSUL_ADDRESS=$MAISON_SERVICES_LOCAL_IP/" ./.env
-  - sed -Ei "s/^MAISON_WEB_CONSUL_TOKEN=.*$/MAISON_WEB_CONSUL_TOKEN=$MAISON_SERVICES_CONSUL_TEMPLATE_ACL_TOKEN/" ./.env
+  - sed -Ei "s/^MAISON_DMX_CONSUL_ADDRESS=.*$/MAISON_DMX_CONSUL_ADDRESS=$MAISON_SERVICES_ADVERTISE_IP/" ./.env
+  - sed -Ei "s/^MAISON_DMX_CONSUL_TOKEN=.*$/MAISON_DMX_CONSUL_TOKEN=$MAISON_SERVICES_CONSUL_SERVICE_ACL_TOKEN/" ./.env
 
   - ./bin/start
 
