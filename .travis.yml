@@ -22,11 +22,12 @@ before_script:
   - ./vendor/maison-services/bin/build
   - ./vendor/maison-services/bin/start
   - ./vendor/maison-services/bin/await
+  - ./vendor/maison-services/bin/migrate
 
   # Update configuration with actual maison-services values.
   - . ./vendor/maison-services/run/.env
-  - sed -Ei "s/^MAISON_WEB_CONSUL_ADDRESS=.*$/MAISON_WEB_CONSUL_ADDRESS=$MAISON_SERVICES_LOCAL_IP/" ./.env
-  - sed -Ei "s/^MAISON_WEB_CONSUL_TOKEN=.*$/MAISON_WEB_CONSUL_TOKEN=$MAISON_SERVICES_CONSUL_TEMPLATE_ACL_TOKEN/" ./.env
+  - sed -Ei "s/^MAISON_WEB_CONSUL_ADDRESS=.*$/MAISON_WEB_CONSUL_ADDRESS=$MAISON_SERVICES_ADVERTISE_IP/" ./.env
+  - sed -Ei "s/^MAISON_WEB_CONSUL_TOKEN=.*$/MAISON_WEB_CONSUL_TOKEN=$MAISON_SERVICES_CONSUL_SERVICE_ACL_TOKEN/" ./.env
 
   - ./bin/start
 
