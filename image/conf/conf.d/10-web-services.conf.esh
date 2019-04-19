@@ -16,5 +16,5 @@ server {
     }
 }
 <%
-done < <(cat /maison/conf/web-services | grep -E '.+')
+done < /maison/conf/web-services | grep -E '.+'
 %>

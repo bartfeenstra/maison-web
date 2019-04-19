@@ -7,8 +7,17 @@ cd "$(dirname "$0")/.."
 if [ ! -f ./.env ]; then
     ./bin/build
 fi
-set -a
 . ./.env
-set +a
 
-find ./start -type f -print0 | sort -z | xargs -0 ./vendor/krab/bin/krab run
+docker run --name maison_web \
+    -d \
+    --restart always \
+    -p '80:80' \
+    -p '443:443' \
+    -e "MAISON_WEB_PROTOCOL=$MAISON_WEB_PROTOCOL" \
+    -e "MAISON_WEB_DOMAIN=$MAISON_WEB_DOMAIN" \
+    -v '/etc/localtime:/etc/localtime:ro' \
+    -v '/etc/timezone:/etc/timezone:ro' \
+    -v "$(realpath ./data/conf):/maison/conf" \
+    -v "$(realpath ./data/letsencrypt):/etc/letsencrypt" \
+    maison-web
