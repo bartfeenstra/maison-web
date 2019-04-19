@@ -7,7 +7,7 @@ services:
     volumes:
       - '/etc/localtime:/etc/localtime:ro'
       - '/etc/timezone:/etc/timezone:ro'
-      - './data/services/web/htpasswd:/etc/nginx/htpasswd'
+      - './data/conf:/maison/conf'
       - './data/services/web/letsencrypt:/etc/letsencrypt'
     expose:
      - '80'
@@ -18,5 +18,3 @@ services:
     environment:
       MAISON_WEB_PROTOCOL: '${MAISON_WEB_PROTOCOL}'
       MAISON_WEB_DOMAIN: '${MAISON_WEB_DOMAIN}'
-      MAISON_WEB_CONSUL_ADDRESS: '${MAISON_WEB_CONSUL_ADDRESS}'
-      MAISON_WEB_CONSUL_TOKEN: '${MAISON_WEB_CONSUL_TOKEN}'
