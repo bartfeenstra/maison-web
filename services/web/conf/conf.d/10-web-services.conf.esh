@@ -2,13 +2,13 @@
 while read -r service_definition; do
     service_name=$(echo "$service_definition" | cut -d' ' -f1)
     service_address=$(echo "$service_definition" | cut -d' ' -f2)
-    service_tag=$(echo "$service_definition" | cut -d' ' -f3)
+    service_visibility=$(echo "$service_definition" | cut -d' ' -f3)
 -%>
 server {
     server_name <%= $service_name.$MAISON_WEB_DOMAIN %>;
     include /etc/nginx/conf.d/server-common.conf.mixin;
     location / {
-        <% if [ "$service_tag" == 'auth' ]; then -%>
+        <% if [ "$service_visibility" != 'public' ]; then -%>
         include /etc/nginx/conf.d/location-auth.conf.mixin;
         <% fi -%>
         include /etc/nginx/conf.d/location-proxy-common.conf.mixin;
