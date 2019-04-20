@@ -4,4 +4,5 @@ set -Eeuo pipefail
 
 cd "$(dirname "$0")/.."
 
-docker stop maison_web
+docker stop maison_web || true
+docker container rm maison_web || true
