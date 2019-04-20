@@ -18,6 +18,6 @@ docker run --name maison_web \
     -e "MAISON_WEB_DOMAIN=$MAISON_WEB_DOMAIN" \
     -v '/etc/localtime:/etc/localtime:ro' \
     -v '/etc/timezone:/etc/timezone:ro' \
-    -v "$(readlink ./data/conf):/maison/conf" \
-    -v "$(readlink ./data/letsencrypt):/etc/letsencrypt" \
+    -v "$(readlink -f ./data/conf):/maison/conf" \
+    -v "$(readlink -f ./data/letsencrypt):/etc/letsencrypt" \
     maison-web
