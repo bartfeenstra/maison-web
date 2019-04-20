@@ -6,8 +6,8 @@ cd "$(dirname "$0")/.."
 
 . .env
 WEB_SERVICE_PORT=8180
-WEB_SERVICE_NAME_WITH_AUTH=maison_web_test_service_auth
-WEB_SERVICE_NAME_WITHOUT_AUTH=maison_web_test_service
+WEB_SERVICE_NAME_WITH_AUTH=maison-web-test-service-auth
+WEB_SERVICE_NAME_WITHOUT_AUTH=maison-web-test-service
 HTTP_BASIC_AUTH_USERNAME=maison_web_test
 HTTP_BASIC_AUTH_PASSWORD=bienvenue
 DOCKER_HOST_IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' maison_web)
