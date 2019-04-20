@@ -35,7 +35,7 @@ docker run --rm -d --name "$CONTAINER_NAME" -p "$WEB_SERVICE_PORT:80" nginx
 htpasswd -b ./data/conf/htpasswd "$HTTP_BASIC_AUTH_USERNAME" "$HTTP_BASIC_AUTH_PASSWORD"
 echo "
 $SERVICE_DEFINITION_WITH_AUTH
-$SERVICE_DEFINITION_WITHOUT_AUTH" > ./data/conf/web-services
+$SERVICE_DEFINITION_WITHOUT_AUTH" >> ./data/conf/web-services
 echo "
 $HOSTS_ENTRY_WITH_AUTH
 $HOSTS_ENTRY_WITHOUT_AUTH" | sudo tee -a /etc/hosts 1>/dev/null
