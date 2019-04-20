@@ -1,4 +1,5 @@
 <%
+service_definitions=$(grep -E '.+' /maison/conf/web-services)
 while read -r service_definition; do
     service_name=$(echo "$service_definition" | cut -d' ' -f1)
     service_address=$(echo "$service_definition" | cut -d' ' -f2)
@@ -16,5 +17,5 @@ server {
     }
 }
 <%
-done < /maison/conf/web-services | grep -E '.+'
+done <<< "$service_definitions"
 %>

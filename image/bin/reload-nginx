@@ -9,10 +9,11 @@ for template in "${templates[@]}"; do
 done
 
 # Obtain HTTPS certificates.
+service_definitions=$(grep -E '.+' /maison/conf/web-services)
 certbot_args="--nginx -n --agree-tos --email bart@mynameisbart.com"
 while read -r service_definition; do
     certbot_args="$certbot_args -d $(echo "$service_definition" | cut -d' ' -f1).$MAISON_WEB_DOMAIN"
-done < <(/maison/conf/web-services | grep -E '.+')
+done <<< "$service_definitions"
 # If HTTPS is not enabled explicitly, use dry runs and allow failures, as those may be caused by non-public domains
 # (*.local), which Let's Encrypt rejects.
 if [ "$MAISON_WEB_PROTOCOL" == 'https' ]; then
