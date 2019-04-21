@@ -7,7 +7,12 @@ while read -r service_definition; do
 -%>
 server {
     server_name <%= $service_name.$MAISON_WEB_DOMAIN %>;
-    include /etc/nginx/conf.d/server-common.conf.mixin;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    location = /favicon.ico {
+        log_not_found off;
+    }
+
     location / {
         <% if [ "$service_visibility" != 'public' ]; then -%>
         include /etc/nginx/conf.d/location-auth.conf.mixin;

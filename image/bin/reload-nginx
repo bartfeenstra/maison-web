@@ -21,6 +21,7 @@ if [ "$MAISON_WEB_PROTOCOL" == 'https' ]; then
 else
     eval "certbot certonly --dry-run $certbot_args" || true
 fi;
+sed -i 's/listen 443 ssl;/listen 443 ssl http2;/' /etc/nginx/conf.d/10-web-services.conf
 
 # Reload nginx.
 nginx -t
