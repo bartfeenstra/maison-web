@@ -1,0 +1,26 @@
+<%
+service_definitions=$(grep -E '.+' /maison/conf/web-services)
+while read -r service_definition; do
+    service_name=$(echo "$service_definition" | cut -d' ' -f1)
+    service_address=$(echo "$service_definition" | cut -d' ' -f2)
+    service_visibility=$(echo "$service_definition" | cut -d' ' -f3)
+-%>
+server {
+    server_name <%= $service_name.$MAISON_WEB_DOMAIN %>;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    location = /favicon.ico {
+        log_not_found off;
+    }
+
+    location / {
+        <% if [ "$service_visibility" != 'public' ]; then -%>
+        include /etc/nginx/conf.d/location-auth.conf.mixin;
+        <% fi -%>
+        include /etc/nginx/conf.d/location-proxy-common.conf.mixin;
+        proxy_pass <%= $service_address %>;
+    }
+}
+<%
+done <<< "$service_definitions"
+%>

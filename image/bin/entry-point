@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Launch nginx.
+nginx -g 'daemon on;'
+
+# Deploy nginx configuration.
+config_version=
+while sleep 1; do
+    current_config_version=$(md5sum /maison/conf/web-services)
+    if [ "$current_config_version" != "$config_version" ]; then
+        if /maison/bin/reload-nginx; then
+            config_version="$current_config_version"
+        fi
+    fi
+done

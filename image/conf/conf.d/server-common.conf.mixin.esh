@@ -1,0 +1,7 @@
+listen 80;
+#add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+location = /favicon.ico {
+    log_not_found off;
+}
+

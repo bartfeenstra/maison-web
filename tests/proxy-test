@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+cd "$(dirname "$0")/.."
+
+. .env
+WEB_SERVICE_PORT=8180
+WEB_SERVICE_NAME_WITH_AUTH=maison-web-test-service-auth
+WEB_SERVICE_NAME_WITHOUT_AUTH=maison-web-test-service
+HTTP_BASIC_AUTH_USERNAME=maison_web_test
+HTTP_BASIC_AUTH_PASSWORD=bienvenue
+DOCKER_HOST_IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' maison_web)
+SERVICE_DEFINITION_WITH_AUTH="$WEB_SERVICE_NAME_WITH_AUTH http://$DOCKER_HOST_IP:$WEB_SERVICE_PORT private"
+SERVICE_DEFINITION_WITHOUT_AUTH="$WEB_SERVICE_NAME_WITHOUT_AUTH http://$DOCKER_HOST_IP:$WEB_SERVICE_PORT public"
+HOSTS_ENTRY_WITH_AUTH="127.0.0.1 $WEB_SERVICE_NAME_WITH_AUTH.$MAISON_WEB_DOMAIN"
+HOSTS_ENTRY_WITHOUT_AUTH="127.0.0.1 $WEB_SERVICE_NAME_WITHOUT_AUTH.$MAISON_WEB_DOMAIN"
+CONTAINER_NAME=maison_web_test
+
+tearDown() {
+    sudo sed -i "/$HOSTS_ENTRY_WITH_AUTH/d" /etc/hosts
+    sudo sed -i "/$HOSTS_ENTRY_WITHOUT_AUTH/d" /etc/hosts
+    printf %s "$(cat /etc/hosts)" | sudo tee /etc/hosts 1>/dev/null
+    docker stop "$CONTAINER_NAME"
+    htpasswd -D ./data/conf/htpasswd "$HTTP_BASIC_AUTH_USERNAME"
+    sed -i "/^$WEB_SERVICE_NAME_WITH_AUTH/d" ./data/conf/web-services
+    sed -i "/^$WEB_SERVICE_NAME_WITHOUT_AUTH/d" ./data/conf/web-services
+    printf %s "$(cat ./data/conf/web-services)" > ./data/conf/web-services
+}
+
+# Prepare the test environment.
+trap 'tearDown' EXIT
+# Start the container first, so we can confirm configuration reloading works.
+docker run --rm -d --name "$CONTAINER_NAME" -p "$WEB_SERVICE_PORT:80" nginx
+htpasswd -b ./data/conf/htpasswd "$HTTP_BASIC_AUTH_USERNAME" "$HTTP_BASIC_AUTH_PASSWORD"
+echo "
+$SERVICE_DEFINITION_WITH_AUTH
+$SERVICE_DEFINITION_WITHOUT_AUTH" >> ./data/conf/web-services
+echo "
+$HOSTS_ENTRY_WITH_AUTH
+$HOSTS_ENTRY_WITHOUT_AUTH" | sudo tee -a /etc/hosts 1>/dev/null
+
+# Give the container a moment to reload the nginx configuration.
+sleep 3
+
+./vendor/krab/bin/krab stdio-state 'Confirm the unprotected test service is accessible via its subdomain.'
+curl -fsSL -D /dev/stderr -o /dev/null "$MAISON_WEB_PROTOCOL://$WEB_SERVICE_NAME_WITHOUT_AUTH.$MAISON_WEB_DOMAIN"
+
+./vendor/krab/bin/krab stdio-state 'Confirm the protected test service is inaccessible via its subdomain without required authentication.'
+if curl -fsSL -D /dev/stderr -o /dev/null "$MAISON_WEB_PROTOCOL://$WEB_SERVICE_NAME_WITH_AUTH.$MAISON_WEB_DOMAIN"; then
+    ./vendor/krab/bin/krab stdio-alert 'A request to a service requiring authentication succeeded without providing the required authentication.'
+    exit 1
+fi
+
+./vendor/krab/bin/krab stdio-state 'Confirm the protected test service is accessible via its subdomain with required authentication.'
+curl -fsSL -D /dev/stderr -o /dev/null --user "$HTTP_BASIC_AUTH_USERNAME:$HTTP_BASIC_AUTH_PASSWORD" "$MAISON_WEB_PROTOCOL://$WEB_SERVICE_NAME_WITH_AUTH.$MAISON_WEB_DOMAIN"

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+
+# Parse ESH templates.
+templates=(/etc/nginx/conf.d/*.conf*.esh)
+for template in "${templates[@]}"; do
+    esh -s /bin/bash -o "${template::-4}" "$template"
+done
+
+# Obtain HTTPS certificates.
+service_definitions=$(grep -E '.+' /maison/conf/web-services)
+certbot_args="--nginx -n --agree-tos --email bart@mynameisbart.com"
+while read -r service_definition; do
+    certbot_args="$certbot_args -d $(echo "$service_definition" | cut -d' ' -f1).$MAISON_WEB_DOMAIN"
+done <<< "$service_definitions"
+# If HTTPS is not enabled explicitly, use dry runs and allow failures, as those may be caused by non-public domains
+# (*.local), which Let's Encrypt rejects.
+if [ "$MAISON_WEB_PROTOCOL" == 'https' ]; then
+    eval "certbot $certbot_args"
+else
+    eval "certbot certonly --dry-run $certbot_args" || true
+fi;
+sed -i 's/listen 443 ssl;/listen 443 ssl http2;/' /etc/nginx/conf.d/10-web-services.conf
+
+# Reload nginx.
+nginx -t
+nginx -s reload

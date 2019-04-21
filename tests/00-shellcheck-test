@@ -16,10 +16,8 @@ while read -r pattern; do
         fi
     done < <(find ./ 2>/dev/null | grep "$pattern")
 done << 'EOF'
-^\./services/[^/]*/run$
 ^\./bin/.*$
-^\./start/.*$
-^\./stop/.*$
+^\./image/bin.*$
 ^\./tests/.*$
 EOF
 

@@ -4,4 +4,6 @@ set -Eeuo pipefail
 
 cd "$(dirname "$0")/.."
 
-docker-compose -p maison build
+docker build -t maison-web \
+    -f ./image/Dockerfile \
+    ./image
