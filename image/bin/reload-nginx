@@ -10,7 +10,7 @@ done
 
 # Obtain HTTPS certificates.
 service_definitions=$(grep -E '.+' /maison/conf/web-services)
-certbot_args="--nginx -n --agree-tos --email bart@mynameisbart.com"
+certbot_args="--nginx --expand -n --agree-tos --email bart@mynameisbart.com"
 while read -r service_definition; do
     certbot_args="$certbot_args -d $(echo "$service_definition" | cut -d' ' -f1).$MAISON_WEB_DOMAIN"
 done <<< "$service_definitions"
